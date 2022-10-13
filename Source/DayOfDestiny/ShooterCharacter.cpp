@@ -6,7 +6,11 @@
 #include "Camera/CameraComponent.h"
 
 // Sets default values
-AShooterCharacter::AShooterCharacter()
+AShooterCharacter::AShooterCharacter() :
+
+	TurnRate(45.f),
+	LookupRate(30.f)
+
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -68,5 +72,19 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AShooterCharacter::MoveForward);
 		PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AShooterCharacter::MoveRight);
 
+		PlayerInputComponent->BindAxis(TEXT("TurnRate"), this, &AShooterCharacter::TurnAtRate);
+		PlayerInputComponent->BindAxis(TEXT("LookupAtRate"), this, &AShooterCharacter::LookupAtRate);
+
+
+}
+
+void AShooterCharacter::TurnAtRate(float Rate)
+{
+	AddControllerYawInput(Rate * TurnRate * GetWorld()->GetDeltaSeconds());   // deg/sec * sec/frame  = deg/frame
+}
+
+void AShooterCharacter::LookupAtRate(float Rate)
+{
+	AddControllerPitchInput(Rate * LookupRate * GetWorld()->GetDeltaSeconds());  // deg/sec * sec/frame = deg/frame
 }
 
