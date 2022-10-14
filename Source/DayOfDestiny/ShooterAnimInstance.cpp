@@ -11,7 +11,7 @@ void UShooterAnimInstance::NativeInitializeAnimation() {
 	ShooterCharacter = Cast<AShooterCharacter>(TryGetPawnOwner());
 }
 
-void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
+void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)   // custom function that will be called from the child AnimBP (i.e. the usual Update Animation node)
 {
 	if (ShooterCharacter == nullptr) {
 		ShooterCharacter = Cast<AShooterCharacter>(TryGetPawnOwner());
