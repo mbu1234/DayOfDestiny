@@ -98,8 +98,9 @@ void AShooterCharacter::FireWeapon()
 
 		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
 		if (FireHit.bBlockingHit) {
-			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
-			DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 2.f);
+			if (ImpactParticles) {
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FireHit.Location);
+			}
 		}
 	}
 
