@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter() :
@@ -76,6 +77,19 @@ void AShooterCharacter::FireWeapon()
 	if (FireSound) {
 		UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
 	}
+
+
+	// Spawning particle system - we need to get the barrel socket, then its transform which is used as a param for SpawnEmmiterAtLocation
+	const USkeletalMeshSocket* BarrelSocket = GetMesh()->GetSocketByName(TEXT("BarrelSocket"));   
+
+	if (BarrelSocket) {
+		const FTransform BarrelSocketTransform = BarrelSocket->GetSocketTransform(GetMesh());
+
+		if (MuzzleFlash) {
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BarrelSocketTransform);
+		}
+	}
+
 }
 
 // Called every frame

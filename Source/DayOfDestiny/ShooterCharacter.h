@@ -57,6 +57,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	class USoundCue* FireSound;
 
+	// Particle system that will be spawned when the fire button is pressed
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* MuzzleFlash;
+
 	// Function used to look right/left at a specific turn rate
 	// @Param Rate: This is normalised so 1.0 is a full turn rate and <1.0 for a lesser turn rate (good for physical game controllers)
 	void TurnAtRate(float Rate);
