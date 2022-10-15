@@ -90,6 +90,15 @@ void AShooterCharacter::FireWeapon()
 		}
 	}
 
+
+	// Play the 'hip fire' montage (using functions from the anim instance)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	
+	if (AnimInstance && HipFireMontage) {
+		AnimInstance->Montage_Play(HipFireMontage);
+		AnimInstance->Montage_JumpToSection(TEXT("StartFire"));
+	}
+
 }
 
 // Called every frame
