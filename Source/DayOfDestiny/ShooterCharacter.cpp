@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter() :
@@ -79,7 +80,6 @@ void AShooterCharacter::FireWeapon()
 		UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
 	}
 
-
 	// Spawning particle system - we need to get the barrel socket, then its transform which is used as a param for SpawnEmmiterAtLocation
 	const USkeletalMeshSocket* BarrelSocket = GetMesh()->GetSocketByName(TEXT("BarrelSocket"));   
 
@@ -96,10 +96,21 @@ void AShooterCharacter::FireWeapon()
 		const FVector RotationAxis{ Rotation.GetAxisX() };
 		FVector End{ Start + RotationAxis * 50'000.f };
 
+		FVector BeamEndPoint{ End };
+
 		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
 		if (FireHit.bBlockingHit) {
 			if (ImpactParticles) {
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FireHit.Location);
+			}
+
+			BeamEndPoint = FireHit.Location;
+
+			if (BeamParticles) {
+				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BarrelSocketTransform);
+				if (Beam) {
+					Beam->SetVectorParameter(TEXT("Target"), BeamEndPoint);  // We get "Target" from the particle system itself
+				}
 			}
 		}
 	}
