@@ -26,20 +26,21 @@ AShooterCharacter::AShooterCharacter() :
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.f;  // Camera is following at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true;  // Rotate the arm based on the controller's rotation
+	CameraBoom->SocketOffset = FVector(0.f, 50.f, 50.f);  // Moving the camera boom 50 cms to the right (Y) and 50 cm up (Z) so we can see our crosshairs in the centre
 
 	// Create a follow camera attached to the camera boom
 	FollowCamera = CreateDefaultSubobject <UCameraComponent>(TEXT("Follow Camera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);  // Attach camera to the end of the boom
 	FollowCamera->bUsePawnControlRotation = false; // We don't want the camera to rotate relative to the arm
 
-	// For now, don't rotate the character as the controller rotates - Let the controller rotate with the camera only
+	// For now, We will rotate the character as the controller rotates (we don't want the character to pitch and roll with the controller though)
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
 
 	// Configure character movement (grabbing hold of the character movement component
-	GetCharacterMovement()->bOrientRotationToMovement = true;  // Character moves in the direction of input
+	GetCharacterMovement()->bOrientRotationToMovement = false;  // We no longer want to rotate the character to our movement
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);  // ... at this rotation rate.
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
