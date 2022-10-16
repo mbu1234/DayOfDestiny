@@ -91,6 +91,8 @@ void AShooterCharacter::FireWeapon()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, BarrelSocketTransform);
 		}
 
+		/*  --------- Not using the code below anymore -----------------
+		
 		FHitResult FireHit;
 		FVector Start{ BarrelSocketTransform.GetLocation() };
 		FQuat Rotation{ BarrelSocketTransform.GetRotation() };
@@ -114,6 +116,55 @@ void AShooterCharacter::FireWeapon()
 				}
 			}
 		}
+
+		*/
+
+		// We are going to line trace from the world position of the crosshairs to the FHitResult's location
+		// We'll also spawn the beamparticles but this will be from the barrel socket  and will extend it to the FHitResult location
+
+		// Get the current size of the viewport
+		FVector2D ViewportSize;
+		if (GEngine && GEngine->GameViewport) {
+			GEngine->GameViewport->GetViewportSize(ViewportSize);
+		}
+
+		FVector2D CrosshairLocations(ViewportSize.X / 2, ViewportSize.Y / 2); // initially, get the centre of the screen
+		CrosshairLocations.Y -= 50.f;  // Remember, we subtracted 50 cm from the Y location in the HUD BP
+
+		// The next 3 lines will get the world position and direction of the crosshairs 
+		FVector CrosshairsWorldPosition;
+		FVector CrosshairsWorldDirection;
+		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocations, CrosshairsWorldPosition, CrosshairsWorldDirection);
+
+		// Set up the line trace
+		if (bScreenToWorld) { // If the project from screen to world is successful .....
+			FHitResult ScreenTraceHit;
+			const FVector Start{ CrosshairsWorldPosition };
+			const FVector End{ CrosshairsWorldPosition + CrosshairsWorldDirection * 50'000.f };
+			FVector BeamEndPoint{ End };
+			GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
+
+			// If we get a blocking hit, spawn the impact particles and the FHitResult location
+			if (ScreenTraceHit.bBlockingHit) {
+				BeamEndPoint = ScreenTraceHit.Location;
+
+				if (ImpactParticles) {
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, ScreenTraceHit.Location);
+				}
+
+			}
+
+			// Spawn the beam particles from the barrel of the gun and extend to the FHitResult's location
+			if (BeamParticles) {
+				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, BarrelSocketTransform);
+				if (Beam) {
+					Beam->SetVectorParameter(TEXT("Target"), BeamEndPoint);
+				}
+			}
+
+		}
+
+
 	}
 
 
