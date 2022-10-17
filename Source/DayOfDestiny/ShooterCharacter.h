@@ -29,6 +29,8 @@ protected:
 	// Called when the fire button is pressed
 	void FireWeapon();
 
+	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
+
 
 public:	
 	// Called every frame
