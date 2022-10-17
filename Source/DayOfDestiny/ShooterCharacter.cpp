@@ -136,22 +136,35 @@ void AShooterCharacter::FireWeapon()
 		FVector CrosshairsWorldDirection;
 		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocations, CrosshairsWorldPosition, CrosshairsWorldDirection);
 
-		// Set up the line trace
+		// Set up the line trace from the world position of the crosshairs
+
 		if (bScreenToWorld) { // If the project from screen to world is successful .....
 			FHitResult ScreenTraceHit;
 			const FVector Start{ CrosshairsWorldPosition };
 			const FVector End{ CrosshairsWorldPosition + CrosshairsWorldDirection * 50'000.f };
 			FVector BeamEndPoint{ End };
+
 			GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
 
 			// If we get a blocking hit, spawn the impact particles and the FHitResult location
 			if (ScreenTraceHit.bBlockingHit) {
 				BeamEndPoint = ScreenTraceHit.Location;
+			}
 
-				if (ImpactParticles) {
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, ScreenTraceHit.Location);
-				}
+			// We need to perform a second trace from the gun barrel
+			FHitResult WeaponTraceHit;
+			const FVector WeaponTraceStart{ BarrelSocketTransform.GetLocation() };
+			const FVector WeaponTraceEnd{ BeamEndPoint };
 
+			GetWorld()->LineTraceSingleByChannel(WeaponTraceHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
+
+			if (WeaponTraceHit.bBlockingHit) {  // Is there an object between the barrel and BeamEndPoint?
+				BeamEndPoint = WeaponTraceHit.Location;
+			}
+
+			// Spawn the impact particles after updating BeamEndPoint (if there is an object between the barrel and BeamEndPoint?
+			if (ImpactParticles) {
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEndPoint);
 			}
 
 			// Spawn the beam particles from the barrel of the gun and extend to the FHitResult's location
