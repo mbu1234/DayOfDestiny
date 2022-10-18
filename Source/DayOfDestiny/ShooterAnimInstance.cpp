@@ -48,6 +48,12 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)   // custo
 
 		MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw;   // Get the difference betweeen rotators - just the Yaw is needed which is a float
 
+		if (ShooterCharacter->GetVelocity().Size() > 0.f) {
+			LastMovementOffsetYaw = MovementOffsetYaw;      
+		}
+		
+
+
 		/* --- Debug only ....
 		FString RotationMessage = FString::Printf(TEXT("Base Aim Rotation: %f"), AimRotation.Yaw);
 		FString MovementRotationMessage = FString::Printf(TEXT("Movement Rotation: %f"), MovementRotation.Yaw);   

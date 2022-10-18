@@ -39,7 +39,10 @@ private:
 	bool bIsAccelerating;
 
 	// Offset Yaw used for strafing
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "True"));
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "True"))
 	float MovementOffsetYaw;
 
+	// Offset Yaw the frame before we stop moving - needed because when we stop moving, we loose the delta between our velocity vector and aim rotation vector
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "True"))
+	float LastMovementOffsetYaw;
 };
