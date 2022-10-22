@@ -65,6 +65,8 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)   // custo
 		}
 		*/
 
+		bIsAiming = ShooterCharacter->GetIsAiming();
+
 
 	}
 }

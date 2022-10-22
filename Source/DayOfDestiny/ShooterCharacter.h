@@ -120,4 +120,6 @@ public:
 	// Returns the camera sub-object
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	FORCEINLINE bool GetIsAiming() const { return bIsAiming; }
+
 };
