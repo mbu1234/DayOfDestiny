@@ -38,6 +38,10 @@ protected:
 	void CameraInterpZoom(float DeltaTime);
 
 
+	// Set TurnRate and LookupRate (i.e. the base turn rate and lookup rate) when aiming
+	void SetLookRates();
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -55,11 +59,54 @@ private:
 
 	// This is the scaling parameter for turning left/right
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float TurnRate;
+	float BaseTurnRate;
 
 	// This is the scaling parameter for looking up/down
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float LookupRate;
+	float BaseLookupRate;
+
+	// This is the scaling parameter when turning (only when using the mouse)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float BaseMouseTurnRate;
+
+	// This is the scaling parameter when looking up (only when using the mouse)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float BaseMouseLookupRate;
+
+
+	// Turn rate when hip firing (i.e. not aiming)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float HipTurnRate;
+
+	// Lookup rate when hip firing (i.e. not aiming)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float HipLookupRate;
+
+	// Turn rate when shoulder firing (i.e. when you are aiming while zoomed in and the gun is at shoulder height)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float AimingTurnRate;
+
+
+	// Lookup rate when shoulder firing (i.e. when you are aiming while zoomed in and the gun is at shoulder height)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float AimingLookupRate;
+
+	// Turn rate when hip firing (i.e. not aiming) - only when using the mouse
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin="20.0", ClampMax="180.0", UIMin = "20.0", UIMax = "180.0"))
+	float HipMouseTurnRate;
+
+	// Lookup rate when hip firing (i.e. not aiming) - only when using the mouse
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "20.0", ClampMax = "180.0", UIMin = "20.0", UIMax = "180.0"))
+	float HipMouseLookupRate;
+
+	// Turn rate when hip firing (i.e. not aiming) - only when using the mouse
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "1.0", ClampMax = "60.0", UIMin = "1.0", UIMax = "60.0"))
+	float AimingMouseTurnRate;
+
+	// Lookup rate when hip firing (i.e. not aiming) - only when using the mouse
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "1.0", ClampMax = "60.0", UIMin = "1.0", UIMax = "60.0"))
+	float AimingMouseLookupRate;
+
 
 	// Sound played when the weapon is fired
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
@@ -98,7 +145,7 @@ private:
 	float CameraCurrentFOV;
 
 	// Camera zoom interpolation speed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"));
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	float ZoomInterpSpeed;
 
 
@@ -110,6 +157,14 @@ private:
 	// Function used to look up/down at a specific turn rate
 	// @Param Rate: This is normalised so 1.0 is a full turn rate and <1.0 for a lesser turn rate (good for physical game controllers)
 	void LookupAtRate(float Rate);
+
+
+	// Turn function used only when using the mouse
+	void Turn(float Value);
+
+
+	// Lookup function used only when using the mouse
+	void Lookup(float Value);
 
 
 

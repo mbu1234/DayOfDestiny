@@ -14,13 +14,35 @@
 // Sets default values
 AShooterCharacter::AShooterCharacter() :
 
-	TurnRate(45.f),
-	LookupRate(30.f),
+	// Base rates for turning / looking up - by default, we are not aiming
+	BaseTurnRate(45.f),
+	BaseLookupRate(30.f),
+	BaseMouseTurnRate(45.f),
+	BaseMouseLookupRate(30.f),
+
+	// True when aiming with the weapon
 	bIsAiming(false),
+
+	// Turn and lookup rates for aiming / not aiming
+	HipTurnRate(90.f),
+	HipLookupRate(90.f),
+	AimingTurnRate(20.f),
+	AimingLookupRate(20.f),
+
+	// Turn and lookup rates for aiming / not aiming - only when using the mouse
+	HipMouseTurnRate(90.f),
+	HipMouseLookupRate(90.f),
+	AimingMouseTurnRate(20.f),
+	AimingMouseLookupRate(20.f),
+
+	// Camera FOV values
 	CameraDefaultFOV(0.f),    // Only 0 temporarily to initialize it, will set it in BeginPlay (when we know we have the camera)
 	CameraZoomedFOV(35.f),
 	CameraCurrentFOV(0.f),   // Only a temp value (will set in BeginPlay once the camera is valid)
 	ZoomInterpSpeed(20.f)
+
+
+
 
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -200,6 +222,24 @@ void AShooterCharacter::CameraInterpZoom(float DeltaTime)
 	GetFollowCamera()->SetFieldOfView(CameraCurrentFOV);
 }
 
+void AShooterCharacter::SetLookRates()
+{
+	if (bIsAiming) {
+		BaseTurnRate = AimingTurnRate;
+		BaseLookupRate = AimingLookupRate;
+
+		BaseMouseTurnRate = AimingMouseTurnRate;
+		BaseMouseLookupRate = AimingMouseLookupRate;
+	}
+	else {
+		BaseTurnRate = HipTurnRate;
+		BaseLookupRate = HipLookupRate;
+
+		BaseMouseTurnRate = HipMouseTurnRate;
+		BaseMouseLookupRate = HipMouseLookupRate;
+	}
+}
+
 
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
@@ -208,7 +248,10 @@ void AShooterCharacter::Tick(float DeltaTime)
 
 	// Set camera current field of view via interpolation
 	CameraInterpZoom(DeltaTime);
+
+	SetLookRates(); // Change look sensitivity based on Aiming
 }
+
 
 // Called to bind functionality to input
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -222,8 +265,8 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		PlayerInputComponent->BindAxis(TEXT("TurnRate"), this, &AShooterCharacter::TurnAtRate);
 		PlayerInputComponent->BindAxis(TEXT("LookupAtRate"), this, &AShooterCharacter::LookupAtRate);
 
-		PlayerInputComponent->BindAxis(TEXT("Turn"), this, &APawn::AddControllerYawInput);
-		PlayerInputComponent->BindAxis(TEXT("Lookup"), this, &APawn::AddControllerPitchInput);
+		PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AShooterCharacter::Turn);
+		PlayerInputComponent->BindAxis(TEXT("Lookup"), this, &AShooterCharacter::Lookup);
 
 		PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
 		PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Released, this, &ACharacter::StopJumping);
@@ -237,11 +280,21 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AShooterCharacter::TurnAtRate(float Rate)
 {
-	AddControllerYawInput(Rate * TurnRate * GetWorld()->GetDeltaSeconds());   // deg/sec * sec/frame  = deg/frame
+	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());   // deg/sec * sec/frame  = deg/frame
 }
 
 void AShooterCharacter::LookupAtRate(float Rate)
 {
-	AddControllerPitchInput(Rate * LookupRate * GetWorld()->GetDeltaSeconds());  // deg/sec * sec/frame = deg/frame
+	AddControllerPitchInput(Rate * BaseLookupRate * GetWorld()->GetDeltaSeconds());  // deg/sec * sec/frame = deg/frame
+}
+
+void AShooterCharacter::Turn(float Value)
+{
+	AddControllerYawInput(Value * BaseMouseTurnRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AShooterCharacter::Lookup(float Value)
+{
+	AddControllerPitchInput(Value * BaseMouseLookupRate * GetWorld()->GetDeltaSeconds());
 }
 
