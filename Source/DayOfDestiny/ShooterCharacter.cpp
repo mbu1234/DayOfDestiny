@@ -15,7 +15,10 @@
 AShooterCharacter::AShooterCharacter() :
 
 	TurnRate(45.f),
-	LookupRate(30.f)
+	LookupRate(30.f),
+	bIsAiming(false),
+	CameraDefaultFOV(0.f),    // Only 0 temporarily to initialize it, will set it in BeginPlay (when we know we have the camera)
+	CameraZoomedFOV(60.f)
 
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -51,6 +54,7 @@ AShooterCharacter::AShooterCharacter() :
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	CameraDefaultFOV = FollowCamera->FieldOfView;
 	
 }
 
@@ -171,6 +175,19 @@ bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, 
 	return false;  // By default return false - shouldn't happen but if the de-projection is not successfull, false is returned
 }
 
+void AShooterCharacter::AimingButtonPressed()
+{
+	bIsAiming = true;
+	FollowCamera->SetFieldOfView(CameraZoomedFOV);
+}
+
+void AShooterCharacter::AimingButtonReleased()
+{
+	bIsAiming = false;
+	FollowCamera->SetFieldOfView(CameraDefaultFOV);
+}
+
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -197,6 +214,9 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Released, this, &ACharacter::StopJumping);
 
 		PlayerInputComponent->BindAction(TEXT("FireButton"), EInputEvent::IE_Pressed, this, &AShooterCharacter::FireWeapon);
+
+		PlayerInputComponent->BindAction(TEXT("AimingButton"), EInputEvent::IE_Pressed, this, &AShooterCharacter::AimingButtonPressed);
+		PlayerInputComponent->BindAction(TEXT("AimingButton"), EInputEvent::IE_Released, this, &AShooterCharacter::AimingButtonReleased);
 
 }
 
