@@ -170,6 +170,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	float ZoomInterpSpeed;
 
+	float ShootTimeDuration;  // used in the TimerManager which is initialized when StartCrosshairBulletFire() is called
+	bool bFiringBullet; 
+	FTimerHandle CrosshairShooterTimer; // Timer handle for the TimerManager
+
 
 
 	// Function used to look right/left at a specific turn rate
@@ -187,6 +191,13 @@ private:
 
 	// Lookup function used only when using the mouse
 	void Lookup(float Value);
+
+
+	void StartCrosshairBulletFire();  // Will be called when shooting , timer will be invoked and after a very short period of time, FinishCrosshairBulletFire() will be called
+
+
+	UFUNCTION()
+	void FinishCrosshairBulletFire();  // Callback function for our timer with timer handle CrosshairShooterTimer - callback functions need the UFUNCTION macro
 
 
 
