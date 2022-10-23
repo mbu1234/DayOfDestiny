@@ -199,4 +199,7 @@ public:
 
 	FORCEINLINE bool GetIsAiming() const { return bIsAiming; }
 
+	UFUNCTION(BlueprintCallable)
+	float GetCrosshairSpreadMultiplier() const;  // This will be blueprint callable so can't be FORCEINLINE
+
 };

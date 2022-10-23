@@ -261,7 +261,11 @@ void AShooterCharacter::Tick(float DeltaTime)
 	// Set camera current field of view via interpolation
 	CameraInterpZoom(DeltaTime);
 
-	SetLookRates(); // Change look sensitivity based on Aiming
+	// Change look sensitivity based on Aiming
+	SetLookRates(); 
+
+	// Calculate the crosshair spread every frame
+	CalculateCrosshairSpread(DeltaTime);
 }
 
 
@@ -308,5 +312,10 @@ void AShooterCharacter::Turn(float Value)
 void AShooterCharacter::Lookup(float Value)
 {
 	AddControllerPitchInput(Value * BaseMouseLookupRate * GetWorld()->GetDeltaSeconds());
+}
+
+float AShooterCharacter::GetCrosshairSpreadMultiplier() const
+{
+	return CrosshairSpreadMultiplier;
 }
 
